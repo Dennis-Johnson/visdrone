@@ -59,7 +59,7 @@ def get_categories(xml_files):
         root = tree.getroot()
         for member in root.findall("object"):
             categories.add(member[0].text)
-    categories = list(categories).sort()
+    categories = list(categories)
     return {name: i for i, name in enumerate(categories)}
 
 

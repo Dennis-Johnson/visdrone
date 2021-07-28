@@ -10,25 +10,25 @@ import os
 
 input_img_folder = 'visdrone_val/images'            #Path to input images folder
 input_ann_folder = 'visdrone_val/annotations'       #Path to original text annotations folder
-output_ann_folder = 'annotations_val'            #Path to output annotaions in xml format
-output_img_folder = 'images_val'          		#Path to ouput images with the bounding boxes shown
+output_ann_folder = 'annotations_val'           	#Path to output annotaions in xml format
+output_img_folder = 'images_val'          			#Path to ouput images with the bounding boxes shown
 
 os.makedirs(output_img_folder, exist_ok=True)
 os.makedirs(output_ann_folder, exist_ok=True)
 
 label_dict = {
-	"0": "Ignored Regions",
-	"1" : "Pedestrian",
-	"2" : "People",
-	"3" : "Bicycle",
-	"4" : "Car",
-	"5" : "Van",
-	"6" : "Truck",
-	"7" : "Tricycle",
-	"8" : "Awning-Tricycle",
-	"9" : "Bus",
-	"10" : "Motor",
-	"11" : "Others",
+	0: "Ignored Regions",
+	1 : "Pedestrian",
+	2 : "People",
+	3 : "Bicycle",
+	4 : "Car",
+	5 : "Van",
+	6 : "Truck",
+	7 : "Tricycle",
+	8 : "Awning-Tricycle",
+	9 : "Bus",
+	10 : "Motor",
+	11 : "Others",
 }
 
 # Bounding Box thickness and color
@@ -91,8 +91,8 @@ for count, annotation_file in enumerate(os.listdir(input_ann_folder)):
 		bbox = (*coords_top_left, *coords_top_right)
 		
 		# Get category
-		label = label_dict.get(line[5])			
-		
+		label = label_dict.get(line[5])		
+
 		# Append a single object's details
 		objectSection = constructObjectSection(label, bbox)
 		annotation_string += objectSection 
