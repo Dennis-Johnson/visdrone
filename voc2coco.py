@@ -48,22 +48,19 @@ def get_filename_as_int(filename):
 
 def get_categories(xml_files):
     """Generate category name to id mapping from a list of xml files.
-    
     Arguments:
         xml_files {list} -- A list of xml file paths.
-    
     Returns:
         dict -- category name to id mapping.
     """
-    classes_names = []
+    categories = set()
     for xml_file in xml_files:
         tree = ET.parse(xml_file)
         root = tree.getroot()
         for member in root.findall("object"):
-            classes_names.append(member[0].text)
-    classes_names = list(set(classes_names))
-    classes_names.sort()
-    return {name: i for i, name in enumerate(classes_names)}
+            categories.add(member[0].text)
+    categories = list(categories).sort()
+    return {name: i for i, name in enumerate(categories)}
 
 
 def convert(xml_files, json_file):
@@ -77,12 +74,14 @@ def convert(xml_files, json_file):
         tree = ET.parse(xml_file)
         root = tree.getroot()
         path = get(root, "path")
+
         if len(path) == 1:
             filename = os.path.basename(path[0].text)
         elif len(path) == 0:
             filename = get_and_check(root, "filename", 1).text
         else:
             raise ValueError("%d paths found in %s" % (len(path), xml_file))
+
         ## The filename must be a number
         image_id = get_filename_as_int(filename)
         size = get_and_check(root, "size", 1)
@@ -95,9 +94,7 @@ def convert(xml_files, json_file):
             "id": image_id,
         }
         json_dict["images"].append(image)
-        ## Currently we do not support segmentation.
-        #  segmented = get_and_check(root, 'segmented', 1).text
-        #  assert segmented == '0'
+
         for obj in get(root, "object"):
             category = get_and_check(obj, "name", 1).text
             if category not in categories:
@@ -146,6 +143,7 @@ if __name__ == "__main__":
     parser.add_argument("xml_dir", help="Directory path to xml files.", type=str)
     parser.add_argument("json_file", help="Output COCO format json file.", type=str)
     args = parser.parse_args()
+
     xml_files = glob.glob(os.path.join(args.xml_dir, "*.xml"))
 
     # If you want to do train/test split, you can pass a subset of xml files to convert function.

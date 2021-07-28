@@ -1,4 +1,6 @@
 /visdrone*
+/val original
 /annotations*
 /images*
+*.jpg
 .DS_Store
