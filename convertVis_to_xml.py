@@ -2,33 +2,40 @@
 Convert Visdrone annotation txt file to XML representation
 Visdrone Annotation Format:
 <bbox_left>, <bbox_top>, <bbox_width>, <bbox_height>, <score>, <object_category>, <truncation>, <occlusion>
+
+Input: dataset_type --> ("train", "test", "val")
 '''
 
 import cv2
 import os
+import sys
 
 
-input_img_folder = 'visdrone_val/images'            #Path to input images folder
-input_ann_folder = 'visdrone_val/annotations'       #Path to original text annotations folder
-output_ann_folder = 'annotations_val'           	#Path to output annotaions in xml format
-output_img_folder = 'images_val'          			#Path to ouput images with the bounding boxes shown
+dataset_type  =  sys.argv[1]
+if dataset_type not in ["train", "test", "val"]:
+	raise ValueError("Unknown dataset type")
+
+input_img_folder = 'visdrone_{}/images'.format(dataset_type)        #Path to input images folder
+input_ann_folder = 'visdrone_{}/annotations'.format(dataset_type)   #Path to original text annotations folder
+output_ann_folder = 'annotations_{}'.format(dataset_type)         	#Path to output annotaions in xml format
+output_img_folder = 'images_{}'.format(dataset_type)       			#Path to ouput images with the bounding boxes shown
 
 os.makedirs(output_img_folder, exist_ok=True)
 os.makedirs(output_ann_folder, exist_ok=True)
 
 label_dict = {
-	0: "Ignored Regions",
-	1 : "Pedestrian",
-	2 : "People",
-	3 : "Bicycle",
-	4 : "Car",
-	5 : "Van",
-	6 : "Truck",
-	7 : "Tricycle",
-	8 : "Awning-Tricycle",
-	9 : "Bus",
-	10 : "Motor",
-	11 : "Others",
+    "0": "Ignore",
+	"1" : "Pedestrian",
+	"2" : "People",
+	"3" : "Bicycle",
+	"4" : "Car",
+	"5" : "Van",
+	"6" : "Truck",
+	"7" : "Tricycle",
+	"8" : "Awning-Tricycle",
+	"9" : "Bus",
+	"10" : "Motor",
+    "11": "Others"
 }
 
 # Bounding Box thickness and color
@@ -84,14 +91,17 @@ for count, annotation_file in enumerate(os.listdir(input_ann_folder)):
 
 	for line in file.readlines():
 		# Cast all elements to ints
-		line = [int(i) for i in line.strip('\n').split(',')] 
+		line = [int(i) for i in line.strip('\n').split(',') if i != ''] 
 
 		coords_top_left  = (line[0],  line[1])
 		coords_top_right = (line[0] + line[2], line[1] + line[3])
 		bbox = (*coords_top_left, *coords_top_right)
 		
-		# Get category
-		label = label_dict.get(line[5])		
+		# Get category only if it's not Others or Ignored Region
+		if line[5] == 0 or line [5] == 11:
+			continue
+
+		label = label_dict.get(str(line[5]))
 
 		# Append a single object's details
 		objectSection = constructObjectSection(label, bbox)
@@ -106,4 +116,4 @@ for count, annotation_file in enumerate(os.listdir(input_ann_folder)):
 	f.write(annotation_string)
 	f.close()
 	count += 1
-	print('[INFO] Completed {} image(s) and annotation(s) pair'.format(count))
+	print('[INFO] Completed {} image and annotation pairs'.format(count))

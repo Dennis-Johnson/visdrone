@@ -1,8 +1,3 @@
-#!/usr/bin/python
-
-# pip install lxml
-
-import sys
 import os
 import json
 import xml.etree.ElementTree as ET
@@ -10,13 +5,6 @@ import glob
 
 START_BOUNDING_BOX_ID = 1
 PRE_DEFINE_CATEGORIES = None
-# If necessary, pre-define category and its id
-#  PRE_DEFINE_CATEGORIES = {"aeroplane": 1, "bicycle": 2, "bird": 3, "boat": 4,
-#  "bottle":5, "bus": 6, "car": 7, "cat": 8, "chair": 9,
-#  "cow": 10, "diningtable": 11, "dog": 12, "horse": 13,
-#  "motorbike": 14, "person": 15, "pottedplant": 16,
-#  "sheep": 17, "sofa": 18, "train": 19, "tvmonitor": 20}
-
 
 def get(root, name):
     vars = root.findall(name)
@@ -59,8 +47,8 @@ def get_categories(xml_files):
         root = tree.getroot()
         for member in root.findall("object"):
             categories.add(member[0].text)
-    categories = list(categories)
-    return {name: i for i, name in enumerate(categories)}
+    categories = list(categories).sort()
+    return {name: i+1 for i, name in enumerate(categories)}
 
 
 def convert(xml_files, json_file):
@@ -69,6 +57,7 @@ def convert(xml_files, json_file):
         categories = PRE_DEFINE_CATEGORIES
     else:
         categories = get_categories(xml_files)
+        
     bnd_id = START_BOUNDING_BOX_ID
     for xml_file in xml_files:
         tree = ET.parse(xml_file)
