@@ -41,14 +41,29 @@ def get_categories(xml_files):
     Returns:
         dict -- category name to id mapping.
     """
-    categories = set()
-    for xml_file in xml_files:
-        tree = ET.parse(xml_file)
-        root = tree.getroot()
-        for member in root.findall("object"):
-            categories.add(member[0].text)
-    categories = list(categories).sort()
-    return {name: i+1 for i, name in enumerate(categories)}
+    # categories = set()
+    # for xml_file in xml_files:
+    #     tree = ET.parse(xml_file)
+    #     root = tree.getroot()
+    #     for member in root.findall("object"):
+    #         categories.add(member[0].text)
+    # categories = list(categories).sort()
+    # return {name: i+1 for i, name in enumerate(categories)}
+    categories = {
+    "0": "Ignore",
+	"1" : "Pedestrian",
+	"2" : "People",
+	"3" : "Bicycle",
+	"4" : "Car",
+	"5" : "Van",
+	"6" : "Truck",
+	"7" : "Tricycle",
+	"8" : "Awning-Tricycle",
+	"9" : "Bus",
+	"10" : "Motor",
+    "11": "Others"
+    }
+    return {name: int(i)+1 for i, name in categories.items()}
 
 
 def convert(xml_files, json_file):
@@ -57,7 +72,7 @@ def convert(xml_files, json_file):
         categories = PRE_DEFINE_CATEGORIES
     else:
         categories = get_categories(xml_files)
-        
+
     bnd_id = START_BOUNDING_BOX_ID
     for xml_file in xml_files:
         tree = ET.parse(xml_file)
@@ -90,6 +105,7 @@ def convert(xml_files, json_file):
                 new_id = len(categories)
                 categories[category] = new_id
             category_id = categories[category]
+
             bndbox = get_and_check(obj, "bndbox", 1)
             xmin = int(get_and_check(bndbox, "xmin", 1).text) - 1
             ymin = int(get_and_check(bndbox, "ymin", 1).text) - 1
