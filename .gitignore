@@ -1,6 +1,7 @@
-/visdrone*
-/val original
-/annotations*
-/images*
+/visdrone_val
+/visdrone_train
+/visdrone_test
 *.jpg
+*.txt
+*.xml
 .DS_Store
