@@ -41,14 +41,7 @@ def get_categories(xml_files):
     Returns:
         dict -- category name to id mapping.
     """
-    # categories = set()
-    # for xml_file in xml_files:
-    #     tree = ET.parse(xml_file)
-    #     root = tree.getroot()
-    #     for member in root.findall("object"):
-    #         categories.add(member[0].text)
-    # categories = list(categories).sort()
-    # return {name: i+1 for i, name in enumerate(categories)}
+    
     categories = {
     "0": "Ignore",
 	"1" : "Pedestrian",
